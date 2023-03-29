@@ -12,6 +12,7 @@ export declare type RequestValidation<TParams, TQuery, TBody> = {
   params?: ZodSchema<TParams>;
   query?: ZodSchema<TQuery>;
   body?: ZodSchema<TBody>;
+  passErrorToNext?: boolean;
 };
 export declare type RequestProcessing<TParams, TQuery, TBody> = {
   params?: ZodEffects<any, TParams>;
@@ -187,8 +188,9 @@ export const validateRequestQuery: <TQuery>(
 export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
   schemas: RequestValidation<TParams, TQuery, TBody>,
 ) => RequestHandler<TParams, any, TBody, TQuery> =
-  ({ params, query, body }) =>
+  ({ params, query, body, passErrorToNext }) =>
   (req, res, next) => {
+    console.log({ params, query, body, passErrorToNext })
     const errors: Array<ErrorListItem> = [];
     if (params) {
       const parsed = params.safeParse(req.params);
@@ -207,6 +209,9 @@ export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
       if (!parsed.success) {
         errors.push({ type: 'Body', errors: parsed.error });
       }
+    }
+    if (passErrorToNext) {
+      return next(errors);
     }
     if (errors.length > 0) {
       return sendErrors(errors, res);

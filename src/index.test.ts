@@ -17,15 +17,19 @@ function mockRequest({
   body,
   query,
   params,
+  passErrorToNext
 }: {
   body?: Record<string, any>;
   query?: Record<string, any>;
   params?: Record<string, any>;
+  passErrorToNext?: boolean;
 }): Partial<Request> {
   return {
     body,
     query,
     params,
+    // @ts-ignore
+    passErrorToNext
   };
 }
 let sendMock = jest.fn();
@@ -533,6 +537,22 @@ describe('Request validator', () => {
     );
     expect(mockedResponse.status).toHaveBeenCalledWith(400);
   });
+
+  it('Should send call next function with error on failed validation of params', () => {
+    const mockedResponse = mockResponse();
+    
+    validateRequest({ body: bodySchema, params: paramsSchema, query: querySchema, passErrorToNext: true })(
+      mockRequest({
+        params: { RequestParamsKey: 1234 },
+        body: { RequestBodyKey: 'dit is de value' },
+        query: { RequestQueryKey: 'dit is de value' }
+      }) as any,
+      mockedResponse as Response,
+      nextFunction,
+    );
+    expect(nextFunction).toHaveBeenCalledWith('');
+  });
+
   it('Should send a HTTP400 on failed validation of body', () => {
     const mockedResponse = mockResponse();
     validateRequest({ body: bodySchema, params: paramsSchema, query: querySchema })(
