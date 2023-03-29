@@ -190,7 +190,6 @@ export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
 ) => RequestHandler<TParams, any, TBody, TQuery> =
   ({ params, query, body, passErrorToNext }) =>
   (req, res, next) => {
-    console.log({ params, query, body, passErrorToNext })
     const errors: Array<ErrorListItem> = [];
     if (params) {
       const parsed = params.safeParse(req.params);
