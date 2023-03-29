@@ -187,8 +187,11 @@ export const validateRequestQuery: <TQuery>(
 
 export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
   schemas: RequestValidation<TParams, TQuery, TBody>,
+  options?: { 
+    passErrorToNext?: boolean
+   }
 ) => RequestHandler<TParams, any, TBody, TQuery> =
-  ({ params, query, body, passErrorToNext }) =>
+  ({ params, query, body }, { passErrorToNext } = {}) =>
   (req, res, next) => {
     const errors: Array<ErrorListItem> = [];
     if (params) {
