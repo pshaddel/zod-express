@@ -4,10 +4,13 @@
   "description": "Express middleware to validate requests using zod schema's.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "homepage": "https://github.com/Aquila169/zod-express-middleware",
+  "homepage": "https://github.com/pshaddel/zod-express",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Aquila169/zod-express-middleware"
+    "url": "https://github.com/pshaddel/zod-express"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "scripts": {
     "test": "jest ./src",
