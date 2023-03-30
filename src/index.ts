@@ -8,11 +8,25 @@ export function stripReadOnly<T>(readOnlyItem: T): NonReadOnly<T> {
   return readOnlyItem as NonReadOnly<T>;
 }
 
+export type Options = {
+  /**
+   * By setting this to true, the error will be passed to the next middleware and you can handle it in a custom way
+   */
+  passErrorToNext?: boolean;
+  /**
+   * By passing this function you can override the default error handling
+   * `passErrorToNext` must not be `true` for this to work
+   * @param errors array of errors
+   * @param res express response object
+   * @returns
+   */
+  sendErrors?: (errors: Array<ErrorListItem>, res: Response) => void;
+};
+
 export declare type RequestValidation<TParams, TQuery, TBody> = {
   params?: ZodSchema<TParams>;
   query?: ZodSchema<TQuery>;
   body?: ZodSchema<TBody>;
-  passErrorToNext?: boolean;
 };
 export declare type RequestProcessing<TParams, TQuery, TBody> = {
   params?: ZodEffects<any, TParams>;
@@ -55,12 +69,17 @@ export const sendError: (error: ErrorListItem, res: Response) => void = (error, 
   return res.status(400).send({ type: error.type, errors: error.errors });
 };
 
-export function processRequestBody<TBody>(effects: ZodSchema<TBody>): RequestHandler<ParamsDictionary, any, TBody, any>;
 export function processRequestBody<TBody>(
-  effects: ZodEffects<any, TBody>
+  effects: ZodSchema<TBody>,
+  options?: Options
 ): RequestHandler<ParamsDictionary, any, TBody, any>;
 export function processRequestBody<TBody>(
-  effectsSchema: ZodEffects<any, TBody> | ZodSchema<TBody>
+  effects: ZodEffects<any, TBody>,
+  options?: Options
+): RequestHandler<ParamsDictionary, any, TBody, any>;
+export function processRequestBody<TBody>(
+  effectsSchema: ZodEffects<any, TBody> | ZodSchema<TBody>,
+  options?: Options
 ): RequestHandler<ParamsDictionary, any, TBody, any> {
   return processRequest({ body: effectsSchema });
 }
@@ -131,29 +150,29 @@ export function processRequest<TParams = any, TQuery = any, TBody = any>(
 
 export const validateRequestBody: <TBody>(
   zodSchema: ZodSchema<TBody>
-) => RequestHandler<ParamsDictionary, any, TBody, any> = (schema) => (req, res, next) => {
-  return validateRequest({ body: schema })(req, res, next);
+) => RequestHandler<ParamsDictionary, any, TBody, any> = (schema, options?: Options) => (req, res, next) => {
+  return validateRequest({ body: schema }, options)(req, res, next);
 };
 
-export const validateRequestParams: <TParams>(zodSchema: ZodSchema<TParams>) => RequestHandler<TParams, any, any, any> =
-  (schema) => (req, res, next) => {
-    return validateRequest({ params: schema })(req, res, next);
-  };
+export const validateRequestParams: <TParams>(
+  zodSchema: ZodSchema<TParams>,
+  options?: Options
+) => RequestHandler<TParams, any, any, any> = (schema, options?: Options) => (req, res, next) => {
+  return validateRequest({ params: schema }, options)(req, res, next);
+};
 
 export const validateRequestQuery: <TQuery>(
-  zodSchema: ZodSchema<TQuery>
-) => RequestHandler<ParamsDictionary, any, any, TQuery> = (schema) => (req, res, next) => {
-  return validateRequest({ query: schema })(req, res, next);
+  zodSchema: ZodSchema<TQuery>,
+  options?: Options
+) => RequestHandler<ParamsDictionary, any, any, TQuery> = (schema, options) => (req, res, next) => {
+  return validateRequest({ query: schema }, options)(req, res, next);
 };
 
 export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
   schemas: RequestValidation<TParams, TQuery, TBody>,
-  options?: {
-    passErrorToNext?: boolean;
-    sendErrors?: (errors: Array<ErrorListItem>, res: Response) => void;
-  }
+  options?: Options
 ) => RequestHandler<TParams, any, TBody, TQuery> =
-  ({ body, params, query }, { passErrorToNext } = {}) =>
+  ({ body, params, query }, options = {}) =>
   (req, res, next) => {
     const errors: Array<ErrorListItem> = [];
     if (params) {
@@ -174,10 +193,13 @@ export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
         errors.push({ type: "Body", errors: parsed.error });
       }
     }
-    if (passErrorToNext) {
+    if (options.passErrorToNext) {
       return next(errors);
     }
     if (errors.length > 0) {
+      if (options?.sendErrors) {
+        return options.sendErrors(errors, res);
+      }
       return sendErrors(errors, res);
     }
     return next();

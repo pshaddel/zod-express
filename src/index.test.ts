@@ -6,7 +6,7 @@ import {
   validateRequest,
   validateRequestBody,
   validateRequestParams,
-  validateRequestQuery,
+  validateRequestQuery
 } from "./index";
 import { z } from "zod";
 import { NextFunction, request, Request, Response } from "express";
@@ -17,7 +17,7 @@ function mockRequest({
   body,
   query,
   params,
-  passErrorToNext,
+  passErrorToNext
 }: {
   body?: Record<string, any>;
   query?: Record<string, any>;
@@ -29,13 +29,13 @@ function mockRequest({
     query,
     params,
     // @ts-ignore
-    passErrorToNext,
+    passErrorToNext
   };
 }
 let sendMock = jest.fn();
 function mockResponse(): Partial<Response> {
   return {
-    status: jest.fn(() => ({ send: sendMock } as any)),
+    status: jest.fn(() => ({ send: sendMock } as any))
   };
 }
 
@@ -73,10 +73,10 @@ describe("Request body processor", () => {
   it("Should modify the request body", () => {
     const requestBody = {
       RequestBodyKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      body: requestBody,
+      body: requestBody
     }) as Request;
     processRequestBody(z.object({ RequestBodyKey: z.string() }))(
       mockedRequest,
@@ -120,10 +120,10 @@ describe("Request body validator", () => {
   it("Should not modify the request body", () => {
     const requestBody = {
       RequestBodyKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      body: requestBody,
+      body: requestBody
     }) as Request;
     validateRequestBody(z.object({ RequestBodyKey: z.string() }))(
       mockedRequest,
@@ -167,10 +167,10 @@ describe("Request query processor", () => {
   it("Should modify the request query", () => {
     const requestQuery = {
       RequestQueryKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      query: requestQuery,
+      query: requestQuery
     }) as any;
     processRequestQuery(z.object({ RequestQueryKey: z.string() }))(
       mockedRequest,
@@ -214,10 +214,10 @@ describe("Request query validator", () => {
   it("Should not modify the request query", () => {
     const requestQuery = {
       RequestQueryKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      query: requestQuery,
+      query: requestQuery
     }) as any;
     validateRequestQuery(z.object({ RequestQueryKey: z.string() }))(
       mockedRequest,
@@ -261,10 +261,10 @@ describe("Request params processor", () => {
   it("Should modify the request params", () => {
     const requestParams = {
       RequestParamsKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      params: requestParams,
+      params: requestParams
     }) as any;
     processRequestParams(z.object({ RequestParamsKey: z.string() }))(
       mockedRequest,
@@ -308,10 +308,10 @@ describe("Request params validator", () => {
   it("Should not modify the request params", () => {
     const requestParams = {
       RequestParamsKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      params: requestParams,
+      params: requestParams
     }) as any;
     validateRequestParams(z.object({ RequestParamsKey: z.string() }))(
       mockedRequest,
@@ -333,7 +333,7 @@ describe("Request processor", () => {
       mockRequest({
         params: { RequestParamsKey: "dit is de value" },
         body: { RequestBodyKey: "dit is de value" },
-        query: { RequestQueryKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
       }) as any,
       mockResponse() as Response,
       nextFunction
@@ -346,7 +346,7 @@ describe("Request processor", () => {
       mockRequest({
         params: { RequestParamsKey: 1234 },
         body: { RequestBodyKey: "dit is de value" },
-        query: { RequestQueryKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -359,7 +359,7 @@ describe("Request processor", () => {
       mockRequest({
         params: { RequestParamsKey: "dit is de value" },
         body: { RequestBodyKey: 1234 },
-        query: { RequestQueryKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -372,7 +372,7 @@ describe("Request processor", () => {
       mockRequest({
         params: { RequestParamsKey: "dit is de value" },
         body: { RequestBodyKey: "dit is de value" },
-        query: { RequestQueryKey: 1234 },
+        query: { RequestQueryKey: 1234 }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -385,7 +385,7 @@ describe("Request processor", () => {
       mockRequest({
         params: { RequestParamsKey: 1234 },
         body: { RequestBodyKey: "dit is de value" },
-        query: { RequestQueryKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -398,7 +398,7 @@ describe("Request processor", () => {
       mockRequest({
         params: { RequestParamsKey: "dit is de value" },
         body: { RequestBodyKey: 1234 },
-        query: { RequestQueryKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -411,7 +411,7 @@ describe("Request processor", () => {
       mockRequest({
         params: { RequestParamsKey: "dit is de value" },
         body: { RequestBodyKey: "dit is de value" },
-        query: { RequestQueryKey: 1234 },
+        query: { RequestQueryKey: 1234 }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -421,10 +421,10 @@ describe("Request processor", () => {
   it("Should modify the request params", () => {
     const requestParams = {
       RequestParamsKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      params: requestParams,
+      params: requestParams
     }) as any;
     processRequest({ params: z.object({ RequestParamsKey: z.string() }) })(
       mockedRequest,
@@ -432,16 +432,16 @@ describe("Request processor", () => {
       nextFunction
     );
     expect(mockedRequest.params).toEqual({
-      RequestParamsKey: requestParams.RequestParamsKey,
+      RequestParamsKey: requestParams.RequestParamsKey
     });
   });
   it("Should modify the request query", () => {
     const requestQuery = {
       RequestQueryKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      query: requestQuery,
+      query: requestQuery
     }) as any;
     processRequest({ query: z.object({ RequestQueryKey: z.string() }) })(
       mockedRequest,
@@ -449,17 +449,17 @@ describe("Request processor", () => {
       nextFunction
     );
     expect(mockedRequest.query).toEqual({
-      RequestQueryKey: requestQuery.RequestQueryKey,
+      RequestQueryKey: requestQuery.RequestQueryKey
     });
   });
 
   it("Should modify the request body", () => {
     const requestBody = {
       RequestBodyKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      body: requestBody,
+      body: requestBody
     }) as Request;
     processRequest({ body: z.object({ RequestBodyKey: z.string() }) })(
       mockedRequest,
@@ -467,41 +467,41 @@ describe("Request processor", () => {
       nextFunction
     );
     expect(mockedRequest.body).toEqual({
-      RequestBodyKey: requestBody.RequestBodyKey,
+      RequestBodyKey: requestBody.RequestBodyKey
     });
   });
 
   it("Should modify the request", () => {
     const requestBody = {
       RequestBodyKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const requestQuery = {
       RequestQueryKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const requestParams = {
       RequestParamsKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
       params: requestParams,
       body: requestBody,
-      query: requestQuery,
+      query: requestQuery
     }) as any;
     processRequest({
       body: z.object({ RequestBodyKey: z.string() }),
-      query: z.object({ RequestQueryKey: z.string() }),
+      query: z.object({ RequestQueryKey: z.string() })
     })(mockedRequest, mockResponse() as Response, nextFunction);
     expect(mockedRequest.body).toEqual({
-      RequestBodyKey: requestBody.RequestBodyKey,
+      RequestBodyKey: requestBody.RequestBodyKey
     });
     expect(mockedRequest.query).toEqual({
-      RequestQueryKey: requestQuery.RequestQueryKey,
+      RequestQueryKey: requestQuery.RequestQueryKey
     });
     expect(mockedRequest.params).toEqual({
       RequestParamsKey: requestParams.RequestParamsKey,
-      SomeOtherRandomValue: requestParams.SomeOtherRandomValue,
+      SomeOtherRandomValue: requestParams.SomeOtherRandomValue
     });
   });
 });
@@ -517,7 +517,7 @@ describe("Request validator", () => {
       mockRequest({
         params: { RequestParamsKey: "dit is de value" },
         body: { RequestBodyKey: "dit is de value" },
-        query: { RequestQueryKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
       }) as any,
       mockResponse() as Response,
       nextFunction
@@ -530,7 +530,7 @@ describe("Request validator", () => {
       mockRequest({
         params: { RequestParamsKey: 1234 },
         body: { RequestBodyKey: "dit is de value" },
-        query: { RequestQueryKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -544,13 +544,32 @@ describe("Request validator", () => {
       mockRequest({
         params: { RequestParamsKey: 1234 },
         body: { RequestBodyKey: "dit is de value" },
-        query: { RequestQueryKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
       }) as any,
       mockedResponse as Response,
       nextFunction
     );
-    // snapshot the call out put
     expect(nextFunction).toHaveBeenCalled();
+  });
+
+  it("Should send use custom error handling function with error on failed validation of params", () => {
+    const sendErrorMock = jest.fn();
+    const mockedResponse = mockResponse();
+    validateRequest(
+      { body: bodySchema, params: paramsSchema, query: querySchema },
+      {
+        sendErrors: sendErrorMock
+      }
+    )(
+      mockRequest({
+        params: { RequestParamsKey: 1234 },
+        body: { RequestBodyKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
+      }) as any,
+      mockedResponse as Response,
+      nextFunction
+    );
+    expect(sendErrorMock).toHaveBeenCalled();
   });
 
   it("Should send a HTTP400 on failed validation of body", () => {
@@ -559,7 +578,7 @@ describe("Request validator", () => {
       mockRequest({
         params: { RequestParamsKey: "dit is de value" },
         body: { RequestBodyKey: 1234 },
-        query: { RequestQueryKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -572,7 +591,7 @@ describe("Request validator", () => {
       mockRequest({
         params: { RequestParamsKey: "dit is de value" },
         body: { RequestBodyKey: "dit is de value" },
-        query: { RequestQueryKey: 1234 },
+        query: { RequestQueryKey: 1234 }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -585,7 +604,7 @@ describe("Request validator", () => {
       mockRequest({
         params: { RequestParamsKey: 1234 },
         body: { RequestBodyKey: "dit is de value" },
-        query: { RequestQueryKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -598,7 +617,7 @@ describe("Request validator", () => {
       mockRequest({
         params: { RequestParamsKey: "dit is de value" },
         body: { RequestBodyKey: 1234 },
-        query: { RequestQueryKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -611,7 +630,7 @@ describe("Request validator", () => {
       mockRequest({
         params: { RequestParamsKey: "dit is de value" },
         body: { RequestBodyKey: "dit is de value" },
-        query: { RequestQueryKey: 1234 },
+        query: { RequestQueryKey: 1234 }
       }) as any,
       mockedResponse as Response,
       nextFunction
@@ -621,10 +640,10 @@ describe("Request validator", () => {
   it("Should not modify the request params", () => {
     const requestParams = {
       RequestParamsKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      params: requestParams,
+      params: requestParams
     }) as any;
     validateRequest({ params: z.object({ RequestParamsKey: z.string() }) })(
       mockedRequest,
@@ -636,10 +655,10 @@ describe("Request validator", () => {
   it("Should not modify the request query", () => {
     const requestQuery = {
       RequestQueryKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      query: requestQuery,
+      query: requestQuery
     }) as any;
     validateRequest({ query: z.object({ RequestQueryKey: z.string() }) })(
       mockedRequest,
@@ -652,10 +671,10 @@ describe("Request validator", () => {
   it("Should not modify the request body", () => {
     const requestBody = {
       RequestBodyKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
-      body: requestBody,
+      body: requestBody
     }) as Request;
     validateRequest({ body: z.object({ RequestBodyKey: z.string() }) })(
       mockedRequest,
@@ -668,24 +687,24 @@ describe("Request validator", () => {
   it("Should not modify the request", () => {
     const requestBody = {
       RequestBodyKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const requestQuery = {
       RequestQueryKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const requestParams = {
       RequestParamsKey: "This is the one we're parsing",
-      SomeOtherRandomValue: "This one should not be removed",
+      SomeOtherRandomValue: "This one should not be removed"
     };
     const mockedRequest = mockRequest({
       params: requestParams,
       body: requestBody,
-      query: requestQuery,
+      query: requestQuery
     }) as any;
     validateRequest({
       body: z.object({ RequestBodyKey: z.string() }),
-      query: z.object({ RequestQueryKey: z.string() }),
+      query: z.object({ RequestQueryKey: z.string() })
     })(mockedRequest, mockResponse() as Response, nextFunction);
     expect(mockedRequest.body).toEqual(requestBody);
     expect(mockedRequest.query).toEqual(requestQuery);
