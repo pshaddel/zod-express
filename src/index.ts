@@ -204,3 +204,14 @@ export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
     }
     return next();
   };
+
+/**
+ * This is constructor for validateRequest. You can pass `options` to it and it will generatre an instance of `validateRequest` with those options.
+ * @param options
+ * @returns
+ */
+export function ValidateRequest<TParams = any, TQuery = any, TBody = any>(options?: Options) {
+  return (schemas: RequestValidation<TParams, TQuery, TBody>) => {
+    return validateRequest(schemas, options);
+  };
+}

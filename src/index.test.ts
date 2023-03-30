@@ -3,6 +3,7 @@ import {
   processRequestBody,
   processRequestParams,
   processRequestQuery,
+  ValidateRequest,
   validateRequest,
   validateRequestBody,
   validateRequestParams,
@@ -709,5 +710,43 @@ describe("Request validator", () => {
     expect(mockedRequest.body).toEqual(requestBody);
     expect(mockedRequest.query).toEqual(requestQuery);
     expect(mockedRequest.params).toEqual(requestParams);
+  });
+});
+
+describe("RequestValidator Constructor", () => {
+  beforeEach(() => {
+    sendMock.mockClear();
+    sendErrorsMock.mockClear();
+  });
+  const paramsSchema = z.object({ RequestParamsKey: z.string() });
+  const bodySchema = z.object({ RequestBodyKey: z.string() });
+  const querySchema = z.object({ RequestQueryKey: z.string() });
+  const sendErrorsMock = jest.fn();
+  it("Should call next(err) with error on failed validation when passErrorToNext is true", () => {
+    const validateRequest = ValidateRequest({ passErrorToNext: true });
+    validateRequest({ body: bodySchema, params: paramsSchema, query: querySchema })(
+      mockRequest({
+        params: { RequestParamsKey: 3 },
+        body: { RequestBodyKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
+      }) as any,
+      mockResponse() as Response,
+      nextFunction
+    );
+    expect(nextFunction).toHaveBeenCalled();
+  });
+
+  it("Should call next(err) with error on failed validation when passErrorToNext is true", () => {
+    const validateRequest = ValidateRequest({ passErrorToNext: false, sendErrors: sendErrorsMock });
+    validateRequest({ body: bodySchema, params: paramsSchema, query: querySchema })(
+      mockRequest({
+        params: { RequestParamsKey: 3 },
+        body: { RequestBodyKey: "dit is de value" },
+        query: { RequestQueryKey: "dit is de value" }
+      }) as any,
+      mockResponse() as Response,
+      nextFunction
+    );
+    expect(sendErrorsMock).toHaveBeenCalled();
   });
 });
