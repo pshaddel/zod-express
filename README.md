@@ -1,6 +1,6 @@
 # zod-express
 
-This is a fork from `zod-express-middleware`. This fork has some changes like passing `sendErrors` function as a custom error handler.
+This is a fork from [`zod-express-middleware`](https://github.com/Aquila169/zod-express-middleware/issues). This fork has some changes like passing `sendErrors` function as a custom error handler.
 
 
 Middleware for [express](https://www.npmjs.com/package/express) that uses [zod](https://www.npmjs.com/package/zod) to make requests type-safe.
