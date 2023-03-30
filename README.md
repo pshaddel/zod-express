@@ -1,4 +1,4 @@
-# zod-express-middleware
+# zod-express
 Middleware for [express](https://www.npmjs.com/package/express) that uses [zod](https://www.npmjs.com/package/zod) to make requests type-safe.
 
 <a href="https://www.npmjs.com/package/zod-express-middleware" rel="nofollow"><img alt="npm" src="https://img.shields.io/npm/v/zod-express-middleware"></a>
@@ -10,16 +10,16 @@ Middleware for [express](https://www.npmjs.com/package/express) that uses [zod](
 
 This package relies on [zod](https://www.npmjs.com/package/zod), [express](https://www.npmjs.com/package/express) and [@types/express](https://www.npmjs.com/package/@types/express). These have been added as peer dependencies so they can be upgraded independently of this package.
 
-[zod-express-middleware](https://www.npmjs.com/package/zod-express-middleware) can be installed using:
+[zod-express](https://www.npmjs.com/package/zod-express) can be installed using:
 
-`npm install zod-express-middleware`
+`npm install zod-express`
 
 ## Usage
 This package provides the `validateRequest` function, which can be used to validate the `.body`, `.query` and `.params` properties of an Express `Request`. Separate functions for each of these are also provided (`validateRequestBody`, `validateRequestQuery` and `validateRequestParams`). 
 
 **Basic example:**
 ```typescript
-import { validateRequest } from 'zod-express-middleware';
+import { validateRequest } from 'zod-express';
 import { z } from 'zod';
 
 // app is an express app
@@ -40,13 +40,13 @@ A full example of using `validateRequest` in a tiny Express app:
 **Full example:**
 ```typescript
 import express from 'express';
-import { validateRequest } from 'zod-express-middleware';
+import { validateRequest } from 'zod-express';
 import { z } from 'zod';
 
 // Create an express app
 const app = express();
 
-// Define an endpoint using express, zod and zod-express-middleware
+// Define an endpoint using express, zod and zod-express
 app.get("/:urlParameter/", validateRequest({
     params: z.object({
       urlParameter: z.string(),
@@ -76,7 +76,7 @@ The `validate*` functions do not modify the query, params or body of the Request
 
 **Zod transformation example:**
 ```typescript
-import { processRequest } from 'zod-express-middleware';
+import { processRequest } from 'zod-express';
 import { z } from 'zod';
 
 export const zodEffects = z
@@ -132,7 +132,7 @@ The other, non-validated properties will have type `any`, as if they were not mo
 
 **Example:**
 ```typescript
-import { validateRequestBody } from 'zod-express-middleware';
+import { validateRequestBody } from 'zod-express';
 import { z } from 'zod';
 
 // app is an express app
@@ -171,7 +171,7 @@ The other, non-processed properties will have type `any`, as if they were not mo
 
 **Example:**
 ```typescript
-import { processRequestBody } from 'zod-express-middleware';
+import { processRequestBody } from 'zod-express';
 import { z } from 'zod';
 
 // app is an express app
@@ -195,7 +195,7 @@ The `sendErrors` function does the same but accepts an array of `ErrorListItem` 
 
 **Example:**
 ```typescript
-import { sendError } from 'zod-express-middleware';
+import { sendError } from 'zod-express';
 import { z } from 'zod';
 
 // app is an express app
@@ -211,11 +211,11 @@ app.get("/", (req, res) => {
 ```
 
 ### TypedRequest
-Besides exporting the above middleware functions, zod-express-middleware also provided several typings for usage with Express requests. Typescript is able to automatically infer the types of your request body, query and params if your endpoint definition is placed in the same file as the validation middleware, as shown above. However, if the code for your endpoint is in a separate file, typings will not be automatically available. This is where the `TypedRequest`, `TypedRequestBody` etc. types come in: the `typeof` a `ZodSchema` can be passed into the `TypedRequest`, providing your function with typings. An example:
+Besides exporting the above middleware functions, zod-express also provided several typings for usage with Express requests. Typescript is able to automatically infer the types of your request body, query and params if your endpoint definition is placed in the same file as the validation middleware, as shown above. However, if the code for your endpoint is in a separate file, typings will not be automatically available. This is where the `TypedRequest`, `TypedRequestBody` etc. types come in: the `typeof` a `ZodSchema` can be passed into the `TypedRequest`, providing your function with typings. An example:
 
 ```typescript
 import { Response } from 'express';
-import { TypedRequestBody } from 'zod-express-middleware';
+import { TypedRequestBody } from 'zod-express';
 
 // bodySchema is a ZodSchema, imported from another file.
 import { bodySchema } from '../validation/requestSchemas';
