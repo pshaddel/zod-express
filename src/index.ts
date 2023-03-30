@@ -146,8 +146,6 @@ export const validateRequestQuery: <TQuery>(
   return validateRequest({ query: schema })(req, res, next);
 };
 
-const firstUpperCase = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-// export const ValidateRequest =  (options): (Parameters<typeof validateRequest>[1]) =>
 export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
   schemas: RequestValidation<TParams, TQuery, TBody>,
   options?: {
