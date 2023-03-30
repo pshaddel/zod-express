@@ -10,7 +10,7 @@
     "url": "https://github.com/pshaddel/zod-express"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "registry": "https://registry.npmjs.org"
   },
   "scripts": {
     "test": "jest ./src",
