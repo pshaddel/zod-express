@@ -1,6 +1,8 @@
 name: npm-publish
 
-on: push
+on:
+  push:
+    branches: [main]
 
 jobs:
   publish:
@@ -13,7 +15,11 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org
+      - name: Release
+              uses: justincy/github-action-npm-release@2.0.1
+              id: release
       - name: publish
+        if: ${{ steps.release.outputs.released == 'true' }}
         run: npm install && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
