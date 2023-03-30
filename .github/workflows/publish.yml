@@ -1,6 +1,9 @@
-name: npm-publish
+name: PUBLISH
 
 on:
+  workflow_run:
+    workflows: [BUILD_LINT_TEST]
+    types: [completed]
   push:
     branches: [main]
 
