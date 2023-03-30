@@ -26,7 +26,7 @@
     "endpoint",
     "validation"
   ],
-  "author": "Casper Schouls",
+  "author": "Poorshad Shaddel",
   "license": "MIT",
   "devDependencies": {
     "@types/express": "^4.17.12",
