@@ -81,29 +81,37 @@ export function processRequestBody<TBody>(
   effectsSchema: ZodEffects<any, TBody> | ZodSchema<TBody>,
   options?: Options
 ): RequestHandler<ParamsDictionary, any, TBody, any> {
-  return processRequest({ body: effectsSchema });
+  return processRequest({ body: effectsSchema }, options);
 }
 
-export function processRequestParams<TParams>(effects: ZodSchema<TParams>): RequestHandler<TParams, any, any, any>;
 export function processRequestParams<TParams>(
-  effects: ZodEffects<any, TParams>
+  effects: ZodSchema<TParams>,
+  options?: Options
 ): RequestHandler<TParams, any, any, any>;
 export function processRequestParams<TParams>(
-  effectsSchema: ZodEffects<any, TParams> | ZodSchema<TParams>
+  effects: ZodEffects<any, TParams>,
+  options?: Options
+): RequestHandler<TParams, any, any, any>;
+export function processRequestParams<TParams>(
+  effectsSchema: ZodEffects<any, TParams> | ZodSchema<TParams>,
+  options?: Options
 ): RequestHandler<TParams, any, any, any> {
-  return processRequest({ params: effectsSchema });
+  return processRequest({ params: effectsSchema }, options);
 }
 
 export function processRequestQuery<TQuery>(
-  effects: ZodSchema<TQuery>
+  effects: ZodSchema<TQuery>,
+  options?: Options
 ): RequestHandler<ParamsDictionary, any, any, TQuery>;
 export function processRequestQuery<TQuery>(
-  effects: ZodEffects<any, TQuery>
+  effects: ZodEffects<any, TQuery>,
+  options?: Options
 ): RequestHandler<ParamsDictionary, any, any, TQuery>;
 export function processRequestQuery<TQuery>(
-  effectsSchema: ZodEffects<any, TQuery> | ZodSchema<TQuery>
+  effectsSchema: ZodEffects<any, TQuery> | ZodSchema<TQuery>,
+  options?: Options
 ): RequestHandler<ParamsDictionary, any, any, TQuery> {
-  return processRequest({ query: effectsSchema });
+  return processRequest({ query: effectsSchema }, options);
 }
 
 export function processRequest<TParams = any, TQuery = any, TBody = any>(
