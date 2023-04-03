@@ -107,13 +107,16 @@ export function processRequestQuery<TQuery>(
 }
 
 export function processRequest<TParams = any, TQuery = any, TBody = any>(
-  schemas: RequestProcessing<TParams, TQuery, TBody>
+  schemas: RequestProcessing<TParams, TQuery, TBody>,
+  options?: Options
 ): RequestHandler<TParams, any, TBody, TQuery>;
 export function processRequest<TParams = any, TQuery = any, TBody = any>(
-  schemas: RequestValidation<TParams, TQuery, TBody>
+  schemas: RequestValidation<TParams, TQuery, TBody>,
+  options?: Options
 ): RequestHandler<TParams, any, TBody, TQuery>;
 export function processRequest<TParams = any, TQuery = any, TBody = any>(
-  schemas: RequestValidation<TParams, TQuery, TBody> | RequestProcessing<TParams, TQuery, TBody>
+  schemas: RequestValidation<TParams, TQuery, TBody> | RequestProcessing<TParams, TQuery, TBody>,
+  options: Options = {}
 ): RequestHandler<TParams, any, TBody, TQuery> {
   return (req, res, next) => {
     const errors: Array<ErrorListItem> = [];
@@ -141,7 +144,13 @@ export function processRequest<TParams = any, TQuery = any, TBody = any>(
         errors.push({ type: "Body", errors: parsed.error });
       }
     }
+    if (errors.length > 0 && options.passErrorToNext) {
+      return next(errors);
+    }
     if (errors.length > 0) {
+      if (options.sendErrors) {
+        return sendErrors(errors, res);
+      }
       return sendErrors(errors, res);
     }
     return next();
@@ -193,7 +202,7 @@ export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
         errors.push({ type: "Body", errors: parsed.error });
       }
     }
-    if (options.passErrorToNext) {
+    if (errors.length > 0 && options.passErrorToNext) {
       return next(errors);
     }
     if (errors.length > 0) {

@@ -1,6 +1,6 @@
 # zod-express
 
-This is a fork from [`zod-express-middleware`](https://github.com/Aquila169/zod-express-middleware/issues). This fork has some changes like passing `sendErrors` function as a custom error handler.
+This was forked from [`zod-express-middleware`](https://github.com/Aquila169/zod-express-middleware/issues).
 
 
 Middleware for [express](https://www.npmjs.com/package/express) that uses [zod](https://www.npmjs.com/package/zod) to make requests type-safe.
@@ -210,6 +210,53 @@ app.get("/", (req, res) => {
       return sendError({type: 'Body', errors: result.error}, res);
     }
     return res.json({ message: "Validation passed" });
+  }
+);
+```
+
+### Options
+
+At the time of creating validator middleware you are able to pass options to the function:
+
+#### passErrorToNext
+This boolean value can pass the error to the `next` function and you can handle the error yourself.
+
+```typescript
+import { validateRequest } from 'zod-express';
+import { z } from 'zod';
+
+// app is an express app
+app.get("/", validateRequest({
+    body: z.object({
+      bodyKey: z.number(),
+    }),
+  }, { passErrorToNext: true }), (req, res) => {
+    // req.body is now strictly-typed and confirms to the zod schema above.
+    // req.body has type { bodyKey: number };
+    return res.json({message: "Validation for body passed"});  
+  }
+);
+```
+
+#### sendErrors
+
+You can pass your custom error handler to `zod-express`:
+```typescript
+import { validateRequest } from 'zod-express';
+import { z } from 'zod';
+
+// app is an express app
+app.get("/", validateRequest({
+    body: z.object({
+      bodyKey: z.number(),
+    }),
+  }, 
+  { sendErrors: (res, errors) => { 
+    res.json({ message: "Bad Request" })} 
+  }), (req, res) => {
+    // req.body is now strictly-typed and confirms to the zod schema above.
+    // req.body has type { bodyKey: number };
+    return res.json({message: "Validation for body passed"});  
   }
 );
 ```
