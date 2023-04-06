@@ -166,7 +166,8 @@ export function processRequest<TParams = any, TQuery = any, TBody = any>(
 }
 
 export const validateRequestBody: <TBody>(
-  zodSchema: ZodSchema<TBody>
+  zodSchema: ZodSchema<TBody>,
+  options?: Options
 ) => RequestHandler<ParamsDictionary, any, TBody, any> = (schema, options?: Options) => (req, res, next) => {
   return validateRequest({ body: schema }, options)(req, res, next);
 };
@@ -190,37 +191,37 @@ export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
   options?: Options
 ) => RequestHandler<TParams, any, TBody, TQuery> =
   ({ body, params, query }, options = {}) =>
-  (req, res, next) => {
-    const errors: Array<ErrorListItem> = [];
-    if (params) {
-      const parsed = params.safeParse(req.params);
-      if (!parsed.success) {
-        errors.push({ type: "Params", errors: parsed.error });
+    (req, res, next) => {
+      const errors: Array<ErrorListItem> = [];
+      if (params) {
+        const parsed = params.safeParse(req.params);
+        if (!parsed.success) {
+          errors.push({ type: "Params", errors: parsed.error });
+        }
       }
-    }
-    if (query) {
-      const parsed = query.safeParse(req.query);
-      if (!parsed.success) {
-        errors.push({ type: "Query", errors: parsed.error });
+      if (query) {
+        const parsed = query.safeParse(req.query);
+        if (!parsed.success) {
+          errors.push({ type: "Query", errors: parsed.error });
+        }
       }
-    }
-    if (body) {
-      const parsed = body.safeParse(req.body);
-      if (!parsed.success) {
-        errors.push({ type: "Body", errors: parsed.error });
+      if (body) {
+        const parsed = body.safeParse(req.body);
+        if (!parsed.success) {
+          errors.push({ type: "Body", errors: parsed.error });
+        }
       }
-    }
-    if (errors.length > 0 && options.passErrorToNext) {
-      return next(errors);
-    }
-    if (errors.length > 0) {
-      if (options?.sendErrors) {
-        return options.sendErrors(errors, res);
+      if (errors.length > 0 && options.passErrorToNext) {
+        return next(errors);
       }
-      return sendErrors(errors, res);
-    }
-    return next();
-  };
+      if (errors.length > 0) {
+        if (options?.sendErrors) {
+          return options.sendErrors(errors, res);
+        }
+        return sendErrors(errors, res);
+      }
+      return next();
+    };
 
 /**
  * This is constructor for validateRequest. You can pass `options` to it and it will generatre an instance of `validateRequest` with those options.
