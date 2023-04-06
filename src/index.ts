@@ -84,6 +84,21 @@ export function processRequestBody<TBody>(
   return processRequest({ body: effectsSchema }, options);
 }
 
+export function processRequestBodyAsync<TBody>(
+  effects: ZodSchema<TBody>,
+  options?: Options
+): RequestHandler<ParamsDictionary, any, TBody, any>;
+export function processRequestBodyAsync<TBody>(
+  effects: ZodEffects<any, TBody>,
+  options?: Options
+): RequestHandler<ParamsDictionary, any, TBody, any>;
+export function processRequestBodyAsync<TBody>(
+  effectsSchema: ZodEffects<any, TBody> | ZodSchema<TBody>,
+  options?: Options
+): RequestHandler<ParamsDictionary, any, TBody, any> {
+  return processRequestAsync({ body: effectsSchema }, options);
+}
+
 export function processRequestParams<TParams>(
   effects: ZodSchema<TParams>,
   options?: Options
@@ -99,6 +114,21 @@ export function processRequestParams<TParams>(
   return processRequest({ params: effectsSchema }, options);
 }
 
+export function processRequestParamsAsync<TParams>(
+  effects: ZodSchema<TParams>,
+  options?: Options
+): RequestHandler<TParams, any, any, any>;
+export function processRequestParamsAsync<TParams>(
+  effects: ZodEffects<any, TParams>,
+  options?: Options
+): RequestHandler<TParams, any, any, any>;
+export function processRequestParamsAsync<TParams>(
+  effectsSchema: ZodEffects<any, TParams> | ZodSchema<TParams>,
+  options?: Options
+): RequestHandler<TParams, any, any, any> {
+  return processRequestAsync({ params: effectsSchema }, options);
+}
+
 export function processRequestQuery<TQuery>(
   effects: ZodSchema<TQuery>,
   options?: Options
@@ -112,6 +142,21 @@ export function processRequestQuery<TQuery>(
   options?: Options
 ): RequestHandler<ParamsDictionary, any, any, TQuery> {
   return processRequest({ query: effectsSchema }, options);
+}
+
+export function processRequestQueryAsync<TQuery>(
+  effects: ZodSchema<TQuery>,
+  options?: Options
+): RequestHandler<ParamsDictionary, any, any, TQuery>;
+export function processRequestQueryAsync<TQuery>(
+  effects: ZodEffects<any, TQuery>,
+  options?: Options
+): RequestHandler<ParamsDictionary, any, any, TQuery>;
+export function processRequestQueryAsync<TQuery>(
+  effectsSchema: ZodEffects<any, TQuery> | ZodSchema<TQuery>,
+  options?: Options
+): RequestHandler<ParamsDictionary, any, any, TQuery> {
+  return processRequestAsync({ query: effectsSchema }, options);
 }
 
 export function processRequest<TParams = any, TQuery = any, TBody = any>(
@@ -165,11 +210,69 @@ export function processRequest<TParams = any, TQuery = any, TBody = any>(
   };
 }
 
+export function processRequestAsync<TParams = any, TQuery = any, TBody = any>(
+  schemas: RequestProcessing<TParams, TQuery, TBody>,
+  options?: Options
+): RequestHandler<TParams, any, TBody, TQuery>;
+export function processRequestAsync<TParams = any, TQuery = any, TBody = any>(
+  schemas: RequestValidation<TParams, TQuery, TBody>,
+  options?: Options
+): RequestHandler<TParams, any, TBody, TQuery>;
+export function processRequestAsync<TParams = any, TQuery = any, TBody = any>(
+  schemas: RequestValidation<TParams, TQuery, TBody> | RequestProcessing<TParams, TQuery, TBody>,
+  options: Options = {}
+): RequestHandler<TParams, any, TBody, TQuery> {
+  return async (req, res, next) => {
+    const errors: Array<ErrorListItem> = [];
+    if (schemas.params) {
+      const parsed = await schemas.params.safeParseAsync(req.params);
+      if (parsed.success) {
+        req.params = parsed.data;
+      } else {
+        errors.push({ type: "Params", errors: parsed.error });
+      }
+    }
+    if (schemas.query) {
+      const parsed = await schemas.query.safeParseAsync(req.query);
+      if (parsed.success) {
+        req.query = parsed.data;
+      } else {
+        errors.push({ type: "Query", errors: parsed.error });
+      }
+    }
+    if (schemas.body) {
+      const parsed = await schemas.body.safeParseAsync(req.body);
+      if (parsed.success) {
+        req.body = parsed.data;
+      } else {
+        errors.push({ type: "Body", errors: parsed.error });
+      }
+    }
+    if (errors.length > 0 && options.passErrorToNext) {
+      return next(errors);
+    }
+    if (errors.length > 0) {
+      if (options.sendErrors) {
+        return sendErrors(errors, res);
+      }
+      return sendErrors(errors, res);
+    }
+    return next();
+  };
+}
+
 export const validateRequestBody: <TBody>(
   zodSchema: ZodSchema<TBody>,
   options?: Options
 ) => RequestHandler<ParamsDictionary, any, TBody, any> = (schema, options?: Options) => (req, res, next) => {
   return validateRequest({ body: schema }, options)(req, res, next);
+};
+
+export const validateRequestBodyAsync: <TBody>(
+  zodSchema: ZodSchema<TBody>,
+  options?: Options
+) => RequestHandler<ParamsDictionary, any, TBody, any> = (schema, options?: Options) => (req, res, next) => {
+  return validateRequestAsync({ body: schema }, options)(req, res, next);
 };
 
 export const validateRequestParams: <TParams>(
@@ -179,12 +282,28 @@ export const validateRequestParams: <TParams>(
   return validateRequest({ params: schema }, options)(req, res, next);
 };
 
+export const validateRequestParamsAsync: <TParams>(
+  zodSchema: ZodSchema<TParams>,
+  options?: Options
+) => RequestHandler<TParams, any, any, any> = (schema, options?: Options) => (req, res, next) => {
+  return validateRequestAsync({ params: schema }, options)(req, res, next);
+};
+
 export const validateRequestQuery: <TQuery>(
   zodSchema: ZodSchema<TQuery>,
   options?: Options
 ) => RequestHandler<ParamsDictionary, any, any, TQuery> = (schema, options) => (req, res, next) => {
   return validateRequest({ query: schema }, options)(req, res, next);
 };
+
+export const validateRequestQueryAsync: <TQuery>(
+  zodSchema: ZodSchema<TQuery>,
+  options?: Options
+) => RequestHandler<ParamsDictionary, any, any, TQuery> = (schema, options) => (req, res, next) => {
+  return validateRequestAsync({ query: schema }, options)(req, res, next);
+};
+
+
 
 export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
   schemas: RequestValidation<TParams, TQuery, TBody>,
@@ -222,6 +341,44 @@ export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
       }
       return next();
     };
+
+export const validateRequestAsync: <TParams = any, TQuery = any, TBody = any>(
+  schemas: RequestValidation<TParams, TQuery, TBody>,
+  options?: Options
+) => RequestHandler<TParams, any, TBody, TQuery> =
+  ({ body, params, query }, options = {}) =>
+    async (req, res, next) => {
+      const errors: Array<ErrorListItem> = [];
+      if (params) {
+        const parsed = await params.safeParseAsync(req.params);
+        if (!parsed.success) {
+          errors.push({ type: "Params", errors: parsed.error });
+        }
+      }
+      if (query) {
+        const parsed = await query.safeParseAsync(req.query);
+        if (!parsed.success) {
+          errors.push({ type: "Query", errors: parsed.error });
+        }
+      }
+      if (body) {
+        const parsed = await body.safeParseAsync(req.body);
+        if (!parsed.success) {
+          errors.push({ type: "Body", errors: parsed.error });
+        }
+      }
+      if (errors.length > 0 && options.passErrorToNext) {
+        return next(errors);
+      }
+      if (errors.length > 0) {
+        if (options?.sendErrors) {
+          return options.sendErrors(errors, res);
+        }
+        return sendErrors(errors, res);
+      }
+      return next();
+    };
+
 
 /**
  * This is constructor for validateRequest. You can pass `options` to it and it will generatre an instance of `validateRequest` with those options.

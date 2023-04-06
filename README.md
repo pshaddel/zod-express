@@ -19,7 +19,7 @@ This package relies on [zod](https://www.npmjs.com/package/zod), [express](https
 `npm install zod-express`
 
 ## Usage
-This package provides the `validateRequest` function, which can be used to validate the `.body`, `.query` and `.params` properties of an Express `Request`. Separate functions for each of these are also provided (`validateRequestBody`, `validateRequestQuery` and `validateRequestParams`). 
+This package provides the `validateRequest` and `validateRequestAsync` function, which can be used to validate the `.body`, `.query` and `.params` properties of an Express `Request`. Separate functions for each of these are also provided (`validateRequestBody`, `validateRequestQuery`, `validateRequestParams` and the async functions `validateRequestBodyAsync`, `validateRequestQueryAsync`, `validateRequestParamsAsync`). 
 
 **Basic example:**
 ```typescript
